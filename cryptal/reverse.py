@@ -2,6 +2,8 @@ from cryptal.multiply import multiply
 
 # calculate such (u, v, d) that xu + vn = d and (x,n) = d
 # we search for inverted x in fi(n) -> `u` in the formula above
+
+
 def reverse(x, n):
     B = x
     A = n
@@ -26,9 +28,9 @@ def reverse(x, n):
 
     u = U
     d = A
-    #v = (d - x * u) / n
+    # v = (d - x * u) / n
 
     if d != 1:
-        raise Exception('Invalid data')
+        raise Exception("Invalid data")
 
     return u

@@ -22,10 +22,7 @@ def generate_keys():
                 x = bin_pow(g, q, p)
                 if x != 1:
                     y = bin_pow(g, x, p)
-                    return {
-                        "public": (p, g, y),
-                        "private": (x, p)
-                    }
+                    return {"public": (p, g, y), "private": (x, p)}
 
 
 def encrypt(pub_key, M):

@@ -7,13 +7,12 @@ def bin_pow(x, k, n):
     i = len(k_bin) - 1
 
     while i >= 0:
-        y = (y*y) % n
+        y = (y * y) % n
 
         bit = k_bin[i]
 
-        if bit == '1':
+        if bit == "1":
             y = (y * x) % n
         i = i - 1
 
     return y
-
