@@ -1,6 +1,7 @@
 from cryptal.rand import random
 from cryptal.bin_pow import bin_pow
 
+
 def is_prime(x):
     if x == 1:
         return False
@@ -17,5 +18,3 @@ def is_prime(x):
             return False
 
     return True
-
-
