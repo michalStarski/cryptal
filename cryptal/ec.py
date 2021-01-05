@@ -1,8 +1,8 @@
 from cryptal.rand import randkbits, random
 from cryptal.is_prime import is_prime
-from cryptal.is_sqrt_remainder import is_sqrt_remainder
 from cryptal.bin_pow import bin_pow
 from cryptal.reverse import reverse
+from cryptal.sqrt import legendre, sqrt
 
 
 def ec_delta(A, B, p):
@@ -11,17 +11,19 @@ def ec_delta(A, B, p):
 
 def calc_ec(curve, x):
     A, B, p = curve
-    return (bin_pow(x, 3, p) + A * x + B) % p
+    return (x * x * x + A * x + B) % p
 
 
-def generate_ec():
-    P_BIT_NUM = 300
+def generate_ec(p=None):
+    if p is None:
+        BIT_NUM = 300
 
-    while True:
-        k = randkbits(P_BIT_NUM)
-        p = 4 * k + 3
-        if is_prime(p):
-            break
+        while True:
+            k = randkbits(BIT_NUM)
+            p = 4 * k + 3
+
+            if is_prime(p):
+                break
 
     while True:
         A = random(0, p)
@@ -43,10 +45,10 @@ def rand_ec_point(curve):
         x = random(0, p)
         f = calc_ec(curve, x)
 
-        if is_sqrt_remainder(p, f):
+        if legendre(f, p) != -1:
             break
 
-    y = bin_pow(f, 2, p)
+    y = sqrt(f, p)
     return (x, y)
 
 
@@ -58,7 +60,7 @@ def check_ec_point(point, curve):
         raise Exception("Invalid input")
 
     L = (y * y) % p
-    P = ((x * x * x) + A * x + B) % p
+    P = calc_ec(curve, x)
 
     return L == P
 
@@ -72,11 +74,22 @@ def opposite_point(point, p):
 
 
 def sum_ec_points(p1, p2, curve):
+    # None acts like a neutral element
+    if p1 is None:
+        return p2
+
+    if p2 is None:
+        return p1
+
     A, B, p = curve
     x1, y1 = p1
     x2, y2 = p2
 
-    if p1 == p2:
+    if x1 == x2 and y1 == (p - y2):
+        # neutral element
+        return None
+
+    elif p1 == p2:
         l = ((3 * bin_pow(x1, 2, p) + A) * reverse(2 * y1, p)) % p
         x3 = (bin_pow(l, 2, p) - 2 * x1) % p
         y3 = (l * (x1 - x3) - y1) % p
@@ -87,3 +100,46 @@ def sum_ec_points(p1, p2, curve):
         y3 = (l * (x1 - x3) - y1) % p
 
     return (x3, y3)
+
+
+# Multiply given point by n
+def multiply_point(point, n, curve):
+    Q = point
+    R = None
+
+    while n > 0:
+        if n % 2 == 1:
+            if R or Q:
+                if R is None:
+                    R = Q
+                else:
+                    R = R
+            else:
+                R = sum_ec_points(R, Q, curve)
+
+            n -= 1
+
+        Q = sum_ec_points(Q, Q, curve)
+        n = n // 2
+    return R
+
+
+def message_to_point(M, curve):
+    global u
+
+    A, B, p = curve
+    u = random(30, 51)
+
+    for j in range(1, u + 1):
+        x = (M * u + j) % p
+        f = (x * x * x + A * x + B) % p
+
+        if legendre(f, p) == 1:
+            y = sqrt(f, p)
+            return (x, y)
+
+
+def point_to_message(point):
+    x, y = point
+    M = (x - 1) // u
+    return M

@@ -30,7 +30,4 @@ def reverse(x, n):
     d = A
     # v = (d - x * u) / n
 
-    if d != 1:
-        raise Exception("Invalid data")
-
     return u

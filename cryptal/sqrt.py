@@ -1,13 +1,12 @@
 from cryptal.bin_pow import bin_pow
 
 
-def euler_theorem(a, p):
-    return bin_pow(a, ((p - 1) // 2), p)
+def legendre(a, p):
+    symbol = bin_pow(a, ((p - 1) // 2), p)
+    return symbol if symbol == 1 or symbol == 0 else -1
 
 
-def sqrt():
-    p, a = map(int, input("p, a: ").split())
-
+def sqrt(a, p):
     if p % 4 != 3:
         raise Exception("p must be a valid prime that equals 3 (mod 4)")
 

@@ -13,7 +13,10 @@ def is_prime(x):
         # The a values 1 and n-1 are not used as the equality holds for
         # all n and all odd n respectively, hence testing them
         # adds no value.
-        a = random(2, x - 2)
+        if x > 4:
+            a = random(2, x - 2)
+        else:
+            a = random(2, x)
         if bin_pow(a, x - 1, x) != 1:
             return False
 
